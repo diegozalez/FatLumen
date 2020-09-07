@@ -1,2 +1,2 @@
 <h1>First revision. Its alive and working</h1>
-<p> Files can be found in <a href='https://easyeda.com/diegozalez/3a-led'> EasyEDA </a>
+<p> Proyect can be found in <a href='https://easyeda.com/diegozalez/3a-led'> EasyEDA </a>
