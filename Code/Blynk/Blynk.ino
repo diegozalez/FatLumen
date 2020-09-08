@@ -10,19 +10,23 @@
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266_SSL.h>
 const int ledPin = 16; 
-// Your token.
-char auth[] = "YOUR TOKEN";
 
-// Your WiFi credentials.
-char ssid[] = "WIFI SSID";
-char pass[] = "WIFI PASSWORD";
+// Your token.
+char auth[] = "YOUR TOKEN HERE";
+char ssid[] = "WIFI SSID HERE";
+char pass[] = "WIFI PASSWORD HERE";
 
 Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
 void setup()
 {
   Serial.begin(9600);
-
+  
+  analogWrite(12, 3);
+  analogWrite(14, 3);
+  analogWrite(ledPin, 3);
+  
   Blynk.begin(auth, ssid, pass);
+  
   tempsensor.begin(0x18);
   tempsensor.setResolution(0);
 }
