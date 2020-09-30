@@ -102,7 +102,7 @@ void sendStatus(){
   
   char buffer[256];
   size_t n = serializeJson(doc, buffer); 
-  if (client.publish("FatLumen/Temp", buffer, n) == true) {
+  if (client.publish("FatLumen/Status", buffer, n) == true) {
     Serial.println("Success sending message");
     LEDtoggle(2,2);
   } else {
