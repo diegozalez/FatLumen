@@ -1,1 +1,1 @@
-<h1>Borad programer</h1>
+<h1>Programing board</h1>
