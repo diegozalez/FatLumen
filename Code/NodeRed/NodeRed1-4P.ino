@@ -6,9 +6,9 @@
 
 Adafruit_MCP9808 temp = Adafruit_MCP9808();
 
-const char* ssid = "Your WiFi SSID";
-const char* password = "Your WiFi Password";
-const char* mqtt_server = "Your MQTT Server(mosquitto)";
+const char* ssid = "Your SSID";
+const char* password = "Your Password";
+const char* mqtt_server = "MQTT Server";
 const uint8_t ledPin [] = {12,14,16}; 
 uint8_t LEDs []={255,255,255};
 IPAddress ip;  
@@ -64,9 +64,9 @@ void loop() {
   if (now - lastMsg > 2000) {
     lastMsg = now;
     ++value;
-    sendStatus();
+    sendStatus(false);
   }
-   
+  
   
 
 }
@@ -86,7 +86,7 @@ void setLED(){
   analogWrite(ledPin[2], LEDs[2]);  
 }
 
-void sendStatus(){
+void sendStatus(bool first){
   temp.wake();
   StaticJsonDocument<220> doc;
   doc["IP"][0] = ip[0];
@@ -101,7 +101,17 @@ void sendStatus(){
   doc["Temp"] = temp.readTempC();
   
   char buffer[256];
-  size_t n = serializeJson(doc, buffer); 
+  size_t n = serializeJson(doc, buffer);
+  if(first){
+     if (client.publish("FatLumen/Boot", buffer, n) == true) {
+    Serial.println("Success sending message");
+    LEDtoggle(2,2);
+  } else {
+    Serial.println("Error sending message");
+  }
+  temp.shutdown_wake(1);
+  }
+  else{
   if (client.publish("FatLumen/Status", buffer, n) == true) {
     Serial.println("Success sending message");
     LEDtoggle(2,2);
@@ -109,6 +119,7 @@ void sendStatus(){
     Serial.println("Error sending message");
   }
   temp.shutdown_wake(1);
+  }
 }
 
 void setup_wifi() {
@@ -126,12 +137,10 @@ void setup_wifi() {
     Serial.print(".");
     LEDtoggle();
   }
-
   randomSeed(micros());
-
   Serial.println("");
   Serial.println("WiFi connected");
-  Serial.println("IP address: ");
+  Serial.print("IP address: ");
   ip=WiFi.localIP();
   Serial.println(ip);
   WiFi.macAddress(mac);
@@ -148,11 +157,10 @@ void setup_wifi() {
   Serial.print(":");
   Serial.println(mac[0],HEX);
   WiFi.macAddress(mac);
-
-  
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
+  
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
@@ -167,9 +175,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
   int LED_0 = LED[0]; // 255
   int LED_1 = LED[1]; // 255
   int LED_2 = LED[2]; // 255
-  Serial.print("LED0");Serial.println(LED_0);
-  Serial.print("LED1");Serial.println(LED_1);
-  Serial.print("LED2");Serial.println(LED_2);
+  Serial.print(LED_0);Serial.print("|");
+  Serial.print(LED_1);Serial.print("|");
+  Serial.println(LED_2);
+  setLED(3,LED[0],LED[1],LED[2]);
 
 }
 
@@ -184,9 +193,9 @@ void reconnect() {
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish("outTopic", "hello world");
+      sendStatus(true);
       // ... and resubscribe
-      client.subscribe("inTopic");
+      client.subscribe("FatLumen/all");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
