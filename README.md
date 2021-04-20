@@ -6,4 +6,3 @@
 
 <p>All the hardware is desing in <a href="https://easyeda.com/diegozalez/3a-led"> EasyEDA </a> so you can find all schematics there or here.</p>
 
-<h1>🚧 Site under construction 🚧</h1>
